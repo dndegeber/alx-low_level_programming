@@ -1,51 +1,89 @@
-#include <stdlib.h>
 #include <string.h>
-#include "main.h"
+#include <stdio.h>
+#include <stdlib.h>
+
 
 /**
- * argstostr - function declaration
- * @ac: no of args
- * @av: array of pointer
- * Return: char type
+ * number - function to calculate number of words
+ * @str: string being passed to check for words
+ *
+ * Return: number of words
  */
-
-char *argstostr(int ac, char **av);
-
-/**
- * argstostr - function definition
- * @ac: number of arguments
- * @av: array of pointers to argumnets
- * Description: Return NULL of pointer to string
- * Return: NULL or a pointer to a string
- */
-
-char *argstostr(int ac, char **av)
+int number(char *str)
 {
-	int row, column, len = 0, total_len = 0;
-	char *str;
+	int a, num = 0;
 
-	if (ac == 0 || av == NULL)
-		return (NULL);
-
-	for (row = 0; row < ac; row++)
+	for (a = 0; str[a] != '\0'; a++)
 	{
-		len = strlen(av[row]);
-		total_len += len + 1;
-	}
-
-	str = (char *) malloc(total_len * sizeof(char));
-	if (str == NULL)
-		return (NULL);
-
-	len = 0;
-	for (row = 0; row < ac; row++)
-	{
-		for (column = 0; av[row][column] != '\0'; column++)
+		if (*str == ' ')
+			str++;
+		else
 		{
-			str[len++] = av[row][column];
+			for (; str[a] != ' ' && str[a] != '\0'; a++)
+				str++;
+			num++;
 		}
-		str[len++] = '\n';
 	}
-	str[len] = '\0';
-	return (str);
+	return (num);
+}
+/**
+ * free_everything - frees the memory
+ * @string: pointer values being passed for freeing
+ * @i: counter
+ */
+void free_everything(char **string, int i)
+{
+	for (; i > 0;)
+		free(string[--i]);
+	free(string);
+}
+
+/**
+ * strtow - function that splits string into words
+ * @str: string being passed
+ * Return: null if string is empty or null or function fails
+ */
+char **strtow(char *str)
+{
+	int total_words = 0, b = 0, c = 0, length = 0;
+	char **words, *found_word;
+
+	if (str == 0 || *str == 0)
+		return (NULL);
+	total_words = number(str);
+	if (total_words == 0)
+		return (NULL);
+	words = malloc((total_words + 1) * sizeof(char *));
+	if (words == 0)
+		return (NULL);
+	for (; *str != '\0' &&  b < total_words;)
+	{
+		if (*str == ' ')
+			str++;
+		else
+		{
+			found_word = str;
+			for (; *str != ' ' && *str != '\0';)
+			{
+				length++;
+				str++;
+			}
+			words[b] = malloc((length + 1) * sizeof(char));
+			if (words[b] == 0)
+			{
+				free_everything(words, b);
+				return (NULL);
+			}
+			while (*found_word != ' ' && *found_word != '\0')
+			{
+				words[b][c] = *found_word;
+				found_word++;
+				c++;
+			}
+			words[b][c] = '\0';
+			b++; c = 0; length = 0;
+			str++;
+		}
+	}
+	return (words);
 }
